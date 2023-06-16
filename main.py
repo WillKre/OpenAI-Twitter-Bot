@@ -1,5 +1,6 @@
 import tweepy
 import json
+import openai
 import boto3
 from botocore.exceptions import ClientError
 
@@ -68,10 +69,50 @@ def getTweets():
 
     return client.search_recent_tweets(query=query, max_results=max_results, tweet_fields=["referenced_tweets"])
 
+def summariseTweet(tweet):
+    """
+    Summarises the parent tweet by using an instruction tuned large language model (LLM).
+
+    Args:
+        tweet (tweepy.Tweet): A Tweepy Tweet object representing the tweet to summarise.
+
+    Returns:
+        str: A summarised version of the tweet's text.
+    """
+
+    openai.api_key = credentials['open_ai']
+    completion = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": "Summarise/Explain in a condensed way the following content in one or two short sentences with a total of no more than 200 characters:"},
+            {"role": "user", "content": tweet.data.text}
+        ]
+    )
+    summarised_tweet = completion.choices[0].message.content
+    print(f"Summarised tweet is: {summarised_tweet}")
+    return summarised_tweet
+
+def respondToTweet(parent_tweet_id, summarised_tweet):
+    """
+    Creates a tweet in response to the parent.
+
+    Args:
+        parent_tweet_id: The id of the parent tweet.
+        summarised_tweet: A summarised version of the tweet's text.
+    """
+
+    client = getTweepyClient()
+
+    client.create_tweet(
+        text=summarised_tweet,
+        in_reply_to_tweet_id=parent_tweet_id
+    )
+    print(f"Successfully responded to tweet: {parent_tweet_id}")
+
 
 def respondToTweets(tweets):
     """
-    Prints the content of the provided tweets and any associated parent tweets.
+    Fetches the "parent tweet" (either the tweet that is quoted or the tweet that is replied to), and replies with a summary.
 
     Args:
         tweets (tweepy.Response): A Tweepy response object containing the tweets to respond to.
@@ -81,15 +122,14 @@ def respondToTweets(tweets):
 
     if tweets.data is not None:
         for tweet in tweets.data:
-            print(f"Tweet is: {tweet.text}")
-
-            # If the tweet references other tweets, retrieve and print their content as well
             if hasattr(tweet, 'referenced_tweets') and tweet.referenced_tweets is not None:
                 for ref_tweet in tweet.referenced_tweets:
                     parent_tweet = client.get_tweet(ref_tweet.id)
                     print(f"Parent tweet is: {parent_tweet.data.text}")
+                    summarised_tweet = summariseTweet(parent_tweet)
+                    respondToTweet(parent_tweet.data.id, summarised_tweet)
             else:
-                print(f"Unable to retrieve parent tweet for tweet id: {tweet.id}")
+                print(f"Unable to retrieve parent tweet for tweet id: {tweet.data.id}")
     else:
         print("No tweets found!")
 
