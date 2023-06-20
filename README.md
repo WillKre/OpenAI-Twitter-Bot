@@ -1,8 +1,12 @@
-# Twitter Bot using Tweepy, OpenAI, and AWS 
+# OpenAI Twitter Bot
 
-This Twitter bot (which is a POC - lacks error handling, etc.) utilizes the Tweepy API, OpenAI and AWS (Secrets Manager & DynamoDB) to interact with tweets when tagged. This bot is configurable and can perform various tasks based on the prompt provided.
+This Twitter bot utilizes the Tweepy API, OpenAI and AWS (Secrets Manager & DynamoDB) to interact with tweets when tagged. This bot is configurable and can perform various tasks based on the prompt provided.
 
 *Note: This bot uses Tweepy's `search_recent_tweets()` function in a polling manner to periodically check for tags and respond. The reason for this is that the Stream API, which provides real-time tweet updates comes with a substantial cost ($5000/month).*
+
+## Demo
+
+![demo](https://github.com/WillKre/OpenAI-Twitter-Bot/assets/7396157/88132454-3572-4868-bd22-4b31d9411e3f)
 
 ## Prerequisites
 
