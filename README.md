@@ -6,7 +6,7 @@ This Twitter bot utilizes the Tweepy API, OpenAI and AWS (Secrets Manager & Dyna
 
 ## Demo
 
-![demo](https://github.com/WillKre/OpenAI-Twitter-Bot/assets/7396157/88132454-3572-4868-bd22-4b31d9411e3f)
+![demo](https://github.com/WillKre/OpenAI-Twitter-Bot/assets/7396157/2b25591d-827f-469c-b5bc-1ff3537f0655)
 
 ## Prerequisites
 
